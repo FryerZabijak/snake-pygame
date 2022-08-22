@@ -5,13 +5,15 @@ import pygame
 
 
 class Snake:
-    def __init__(self, color, snake, screen):
+    def __init__(self, speedX, speedY, color, trace, screen):
+        self.speedX = speedX
+        self.speedY = speedY
         self.color = color
-        self.snake = snake
+        self.trace = trace
         self.screen = screen
 
     def DrawSnake(self):
-        for pos in self.snake:
+        for pos in self.trace:
             snake_block_x = pos["x"]
             snake_block_y = pos["y"]
             pygame.draw.rect(self.screen,
@@ -20,30 +22,30 @@ class Snake:
                               size, size)
                              )
 
-    def Move(self, x, y):
+    def Move(self):
         new_positions = []
-        newX = self.snake[0]["x"]+x
+        newX = self.trace[0]["x"]+self.speedX
         if newX<0:
             newX=width
         elif newX>=width:
             newX=0
-        newY = self.snake[0]["y"]+y
+        newY = self.trace[0]["y"]+self.speedY
         if newY<0:
             newY=height
         elif newY>=height:
             newY=0
         new_positions.append({"x": newX, "y": newY})
 
-        for pos in self.snake:
+        for pos in self.trace:
             new_positions.append(pos)
 
         new_positions.pop()
-        self.snake = new_positions
+        self.trace = new_positions
         return new_positions
 
     def CheckDeath(self):
         # Boundaries
-        snake_copy = list.copy(self.snake)
+        snake_copy = list.copy(self.trace)
         snake_head = snake_copy[0]
 
         # Himself

@@ -1,3 +1,4 @@
+from random import randint, random
 import pygame
 from food import Food
 from player import Snake
@@ -8,21 +9,18 @@ pygame.init()
 screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 
-# Nastavení začátku hada do středu
+# Nastavení začátku hada do středudd
 snake_starting_positions = [{"x": round(width//2/size)*size, "y": round(width//2/size)*size},
-                            {"x": round(width//2/size)*size, "y": round(width//2/size)*size+size},
+                            {"x": round(width//2/size)*size,
+                             "y": round(width//2/size)*size+size},
                             {"x": round(width//2/size)*size, "y": round(width//2/size)*size+size+size}]
 
 # Vytvoření třídy had pro hráče
-player = Snake(snake_color, snake_starting_positions, screen)
+player = Snake(0,-size,snake_color,snake_starting_positions,screen)
 
 # Vytvoření třídy pro jídlo s náhodným generováním pozice
-food = Food(screen, None, None)
-
-
-# Rychlost nastavena tak, aby had začínal směrem vzhůru
-speedX = 0
-speedY = -size
+food = Food(screen, None, None, player)
+foods = [food]
 
 # Deklarované a inicializované skóre na nulu
 score = 0
@@ -48,33 +46,42 @@ while game_running:
         # Stisknuté klávesy se uloží do proměnné "keys"
         keys = pygame.key.get_pressed()
         # Jestli se zmáčkne "W" a zároveň hráč nejede směrem "nahoru", tak se nastaví aby tudma jel
-        if (keys[pygame.K_w] and speedY != size):
-            speedX = 0
-            speedY = -size
+        if (keys[pygame.K_w] and player.speedY != size):
+            player.speedX = 0
+            player.speedY = -size
         # Jestli se zmáčkne "A" a zároveň hráč nejede směrem "doleva", tak se nastaví aby tudma jel
-        elif (keys[pygame.K_a] and speedX != size):
-            speedX = -size
-            speedY = -0
+        elif (keys[pygame.K_a] and player.speedX != size):
+            player.speedX = -size
+            player.speedY = -0
         # Jestli se zmáčkne "S" a zároveň hráč nejede směrem "doprava", tak se nastaví aby tudma jel
-        elif (keys[pygame.K_s] and speedY != -size):
-            speedX = 0
-            speedY = size
+        elif (keys[pygame.K_s] and player.speedY != -size):
+            player.speedX = 0
+            player.speedY = size
         # Jestli se zmáčkne "D" a zároveň hráč nejede směrem "dolů", tak se nastaví aby tudma jel
-        elif (keys[pygame.K_d] and speedX != -size):
-            speedX = size
-            speedY = 0
+        elif (keys[pygame.K_d] and player.speedX != -size):
+            player.speedX = size
+            player.speedY = 0
 
         # Jestliže následujícím tahem, hráč dopadne na jídlo (na 100%), tak se zvětší o jeden bod a přibude mu skóre
         # plus se aktualizuje text
-        if player.snake[0]["x"]+speedX == food.x and player.snake[0]["y"]+speedY == food.y:
-            food = Food(screen, None, None)
-            player.snake.append({"x": food.x, "y": food.y})
-            score += 10
-            score_text = system_font.render(
-                f"Skóre: {score}", True, TEXT_COLOR)
+        new_foods = []
+        for f in foods:
+
+            if f.CheckEat():
+                f = Food(screen, None, None, player)
+                player.trace.append({"x": food.x, "y": food.y})
+                score += 10
+                score_text = system_font.render(
+                    f"Skóre: {score}", True, TEXT_COLOR)
+                new_food = Food(screen,None,None,player)
+                if randint(0,6)==0 and len(foods)<5:
+                    new_foods.append(new_food)
+                    FPS+=2
+            new_foods.append(f)
+        foods = new_foods
 
         # Pohyb hráče ve směru
-        player.Move(speedX, speedY)
+        player.Move()
 
     # Zjistí-li, že je hráč mrtvý "game_running" se přepne na false (tzn. konec hry)
     if player.CheckDeath():
@@ -83,8 +90,9 @@ while game_running:
     # Kreslení - začíná se pozadí, poté hadem, jídlem a textem
     screen.fill(BACKGROUND_COLOR)
     player.DrawSnake()
+    for f in foods:
+        f.DrawFood()
 
-    food.DrawFood()
 
     screen.blit(score_text, score_text_rect)
     pygame.display.update()
