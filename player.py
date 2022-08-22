@@ -12,6 +12,7 @@ class Snake:
         self.trace = trace
         self.screen = screen
 
+    # Vykreslení hada
     def DrawSnake(self):
         for pos in self.trace:
             snake_block_x = pos["x"]
@@ -22,6 +23,7 @@ class Snake:
                               size, size)
                              )
 
+    # Pohyb hada
     def Move(self):
         new_positions = []
         newX = self.trace[0]["x"]+self.speedX
@@ -43,6 +45,7 @@ class Snake:
         self.trace = new_positions
         return new_positions
 
+    # Zkontroluje zda-li had zemřel
     def CheckDeath(self):
         # Boundaries
         snake_copy = list.copy(self.trace)

@@ -16,7 +16,7 @@ snake_starting_positions = [{"x": round(width//2/size)*size, "y": round(width//2
                             {"x": round(width//2/size)*size, "y": round(width//2/size)*size+size+size}]
 
 # Vytvoření třídy had pro hráče
-player = Snake(0,-size,snake_color,snake_starting_positions,screen)
+player = Snake(0, -size, snake_color, snake_starting_positions, screen)
 
 # Vytvoření třídy pro jídlo s náhodným generováním pozice
 food = Food(screen, None, None, player)
@@ -66,17 +66,16 @@ while game_running:
         # plus se aktualizuje text
         new_foods = []
         for f in foods:
-
             if f.CheckEat():
                 f = Food(screen, None, None, player)
                 player.trace.append({"x": food.x, "y": food.y})
                 score += 10
                 score_text = system_font.render(
                     f"Skóre: {score}", True, TEXT_COLOR)
-                new_food = Food(screen,None,None,player)
-                if randint(0,6)==0 and len(foods)<5:
+                new_food = Food(screen, None, None, player)
+                if randint(0, 4) == 0 and len(foods):
                     new_foods.append(new_food)
-                    FPS+=2
+                    FPS += 2
             new_foods.append(f)
         foods = new_foods
 
@@ -92,7 +91,6 @@ while game_running:
     player.DrawSnake()
     for f in foods:
         f.DrawFood()
-
 
     screen.blit(score_text, score_text_rect)
     pygame.display.update()
